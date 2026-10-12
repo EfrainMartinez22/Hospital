@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import perfil from "../img/perfil.jpg";
 
 export default function About() {
     const doctor = {
@@ -38,7 +39,11 @@ export default function About() {
 
                             {/* Foto placeholder */}
                             <div className="h-24 w-24 rounded-2xl bg-slate-100 flex items-center justify-center text-slate-400 text-sm font-medium">
-                                <img src="src/img/perfil.jpg" alt="" />
+                                <img
+                                    src={perfil}
+                                    alt="Dr. José Miguel Plascencia Ramírez"
+                                    className="w-full h-full object-cover"
+                                />
                             </div>
 
                             <div>
