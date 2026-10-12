@@ -16,23 +16,13 @@ export default function Login() {
     setError("");
 
     try {
-      await login("ingefrainmart@gmail.com", "Daniela.180");
+      await login(email.trim(), password);
       nav("/admin", { replace: true });
     } catch (err) {
+      console.error("ERROR LOGIN:", err);
       setError(err?.message || "Error al iniciar sesión");
     }
   };
-  /* const submit = async (e) => {
-    e.preventDefault();
-    setError("");
-
-    try {
-      await login(email, password);
-      nav("/admin", { replace: true });
-    } catch (err) {
-      setError(err?.message || "Error al iniciar sesión");
-    }
-  }; */
 
   return (
     <div className="flex items-center justify-center p-6 py-12 bg-slate-50">
@@ -43,8 +33,12 @@ export default function Login() {
         <h1 className="text-2xl font-semibold text-slate-900">Acceso</h1>
         <p className="text-slate-600 text-sm mt-1">Panel del consultorio</p>
 
-        <label className="block mt-5 text-sm text-slate-700">Email</label>
+        <label htmlFor="login-email" className="block mt-5 text-sm text-slate-700">
+          Email
+        </label>
         <input
+          id="login-email"
+          type="email"
           className="mt-2 w-full border border-slate-200 rounded-xl p-3 outline-none focus:ring-2 focus:ring-teal-200"
           placeholder="correo@dominio.com"
           value={email}
@@ -54,9 +48,12 @@ export default function Login() {
           required
         />
 
-        <label className="block mt-4 text-sm text-slate-700">Contraseña</label>
+        <label htmlFor="login-password" className="block mt-4 text-sm text-slate-700">
+          Contraseña
+        </label>
         <div className="mt-2 flex items-stretch gap-2">
           <input
+            id="login-password"
             className="w-full border border-slate-200 rounded-xl p-3 outline-none focus:ring-2 focus:ring-teal-200"
             placeholder="Tu contraseña"
             type={showPass ? "text" : "password"}
@@ -74,7 +71,7 @@ export default function Login() {
           </button>
         </div>
 
-        {error && <div className="mt-3 text-red-600 text-sm">{error}</div>}
+        {error && <div role="alert" className="mt-3 text-red-600 text-sm">{error}</div>}
 
         <button
           type="submit"

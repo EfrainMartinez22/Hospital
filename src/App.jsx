@@ -1,5 +1,5 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { AuthProvider } from "./context/AuthContext";
+import { BrowserRouter, Navigate, Routes, Route } from "react-router-dom";
+import { AuthProvider, useAuth } from "./context/AuthContext";
 
 import Layout from "./components/layout";
 import LayoutAdmin from "./components/AdminLayout";
@@ -12,6 +12,11 @@ import Admin from "./pages/Admin";
 import Conocenos from "./pages/About";
 import Contact from "./pages/Contact";
 import AdminAppointments from "./pages/AdminAppointments";
+
+function GuestLogin() {
+  const { isAuthed } = useAuth();
+  return isAuthed ? <Navigate to="/admin" replace /> : <Login />;
+}
 
 function NoAuth() {
   return (
@@ -37,33 +42,22 @@ export default function App() {
     <BrowserRouter>
       <AuthProvider>
         <Routes>
-          {/* Páginas públicas */}
           <Route element={<Layout />}>
             <Route path="/" element={<Home />} />
             <Route path="/galeria" element={<Gallery />} />
-            <Route path="/login" element={<Login />} />
+            <Route path="/login" element={<GuestLogin />} />
             <Route path="/no-autorizado" element={<NoAuth />} />
             <Route path="/nosotros" element={<Conocenos />} />
             <Route path="/contactanos" element={<Contact />} />
           </Route>
 
-          {/* Panel admin */}
           <Route element={<ProtectedRoute />}>
             <Route path="/admin" element={<LayoutAdmin />}>
               <Route index element={<Admin />} />
               <Route path="citas" element={<AdminAppointments />} />
-              <Route
-                path="pacientes"
-                element={<AdminPlaceholder title="Pacientes" />}
-              />
-              <Route
-                path="galeria"
-                element={<AdminPlaceholder title="Galería" />}
-              />
-              <Route
-                path="configuracion"
-                element={<AdminPlaceholder title="Configuración" />}
-              />
+              <Route path="pacientes" element={<AdminPlaceholder title="Pacientes" />} />
+              <Route path="galeria" element={<AdminPlaceholder title="Galería" />} />
+              <Route path="configuracion" element={<AdminPlaceholder title="Configuración" />} />
             </Route>
           </Route>
         </Routes>
