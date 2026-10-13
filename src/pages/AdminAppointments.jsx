@@ -11,6 +11,12 @@ import {
 import { apiFetch } from "../lib/api";
 import AppointmentCalendar from "../components/AppointmentCalendar";
 
+const HOSPITALS = [
+  { id: 1, label: "San Rafael — Tepic" },
+  { id: 2, label: "Puerta de Hierro — Tepic" },
+  { id: 3, label: "Puerta de Hierro — Colima" },
+];
+
 function typeLabel(type) {
   if (type === 1) return "Primera vez";
   if (type === 2) return "Subsecuente";
@@ -23,6 +29,7 @@ function CreateAppointmentModal({ onClose, onCreated }) {
     last_name: "",
     age: "",
     phone: "",
+    hospital_id: 2,
     date: "",
     time: "",
     appointment_type: 1,
@@ -37,44 +44,53 @@ function CreateAppointmentModal({ onClose, onCreated }) {
     setForm((prev) => {
       const next = { ...prev, [field]: value };
 
-      if (field === "date" || field === "appointment_type") {
+      if (field === "date" || field === "appointment_type" || field === "hospital_id") {
         next.time = "";
       }
 
+      if (field === "hospital_id") {
+        next.date = "";
+      }
       return next;
     });
-  }
-
-  async function loadAvailableSlots(date, appointmentType) {
-    if (!date || !appointmentType) {
+    if (field === "hospital_id") {
       setAvailableSlots([]);
-      return;
-    }
-
-    try {
-      setSlotsLoading(true);
       setError("");
-
-      const params = new URLSearchParams({
-        date,
-        appointment_type: String(appointmentType),
-      });
-
-      const data = await apiFetch(
-        `/appointments/available-slots?${params.toString()}`
-      );
-      setAvailableSlots(data.items || []);
-    } catch (err) {
-      setAvailableSlots([]);
-      setError(err.message || "No se pudieron cargar los horarios disponibles");
-    } finally {
-      setSlotsLoading(false);
     }
   }
 
   useEffect(() => {
-    loadAvailableSlots(form.date, form.appointment_type);
-  }, [form.date, form.appointment_type]);
+    let cancelled = false;
+    async function loadAvailableSlots() {
+      setAvailableSlots([]);
+      setError("");
+      if (!form.date || !form.appointment_type || !form.hospital_id) {
+        setSlotsLoading(false);
+        return;
+      }
+      setSlotsLoading(true);
+      try {
+        const params = new URLSearchParams({
+          date: form.date,
+          appointment_type: String(form.appointment_type),
+          hospital_id: String(form.hospital_id),
+        });
+        const data = await apiFetch(
+          `/appointments/available-slots?${params.toString()}`
+        );
+        if (!cancelled) setAvailableSlots(data.items || []);
+      } catch (err) {
+        if (!cancelled) {
+          setAvailableSlots([]);
+          setError(err.message || "No se pudieron cargar los horarios disponibles");
+        }
+      } finally {
+        if (!cancelled) setSlotsLoading(false);
+      }
+    }
+    loadAvailableSlots();
+    return () => { cancelled = true; };
+  }, [form.date, form.appointment_type, form.hospital_id]);
 
   async function submit(e) {
     e.preventDefault();
@@ -99,6 +115,7 @@ function CreateAppointmentModal({ onClose, onCreated }) {
           ...form,
           age: form.age ? Number(form.age) : null,
           appointment_type: Number(form.appointment_type),
+          hospital_id: Number(form.hospital_id),
         }),
       });
 
@@ -140,9 +157,24 @@ function CreateAppointmentModal({ onClose, onCreated }) {
             />
           </div>
 
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-1">
-            <div>
-              <label className="block text-sm text-slate-700">Nombre</label>
+                  <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-1">
+          <div className="sm:col-span-2 lg:col-span-1">
+            <label className="block text-sm text-slate-700">Hospital</label>
+            <select
+              value={form.hospital_id}
+              onChange={(e) => updateField("hospital_id", Number(e.target.value))}
+              className="mt-2 w-full rounded-xl border border-slate-200 bg-white p-3 outline-none focus:ring-2 focus:ring-teal-200"
+              required
+            >
+              {HOSPITALS.map((hospital) => (
+                <option key={hospital.id} value={hospital.id}>
+                  {hospital.label}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="block text-sm text-slate-700">Nombre</label>
               <input
                 value={form.first_name}
                 onChange={(e) => updateField("first_name", e.target.value)}
