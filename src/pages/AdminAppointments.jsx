@@ -133,6 +133,8 @@ function CreateAppointmentModal({ onClose, onCreated }) {
         <form onSubmit={submit} className="mt-6 grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
           <div>
             <AppointmentCalendar
+              key={form.hospital_id}
+              hospitalId={form.hospital_id}
               value={form.date}
               onChange={(date) => updateField("date", date)}
             />
@@ -219,10 +221,10 @@ function CreateAppointmentModal({ onClose, onCreated }) {
                   {!form.date
                     ? "Selecciona primero un día"
                     : slotsLoading
-                    ? "Cargando horarios..."
-                    : availableSlots.length === 0
-                    ? "No hay horarios disponibles"
-                    : "Selecciona una hora"}
+                      ? "Cargando horarios..."
+                      : availableSlots.length === 0
+                        ? "No hay horarios disponibles"
+                        : "Selecciona una hora"}
                 </option>
 
                 {availableSlots.map((slot) => (
@@ -575,13 +577,12 @@ export default function AdminAppointments() {
                     </td>
                     <td className="py-4 pr-4">
                       <span
-                        className={`rounded-full px-3 py-1 text-xs font-medium ${
-                          item.appointment_type === 1
+                        className={`rounded-full px-3 py-1 text-xs font-medium ${item.appointment_type === 1
                             ? "bg-teal-100 text-teal-700"
                             : item.appointment_type === 2
-                            ? "bg-blue-100 text-blue-700"
-                            : "bg-slate-100 text-slate-700"
-                        }`}
+                              ? "bg-blue-100 text-blue-700"
+                              : "bg-slate-100 text-slate-700"
+                          }`}
                       >
                         {typeLabel(item.appointment_type)}
                       </span>
