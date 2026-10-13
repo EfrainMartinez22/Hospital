@@ -12,6 +12,7 @@ import Admin from "./pages/Admin";
 import Conocenos from "./pages/About";
 import Contact from "./pages/Contact";
 import AdminAppointments from "./pages/AdminAppointments";
+import AdminSettings from "./pages/AdminSettings";
 
 function GuestLogin() {
   const { isAuthed } = useAuth();
@@ -57,7 +58,7 @@ export default function App() {
               <Route path="citas" element={<AdminAppointments />} />
               <Route path="pacientes" element={<AdminPlaceholder title="Pacientes" />} />
               <Route path="galeria" element={<AdminPlaceholder title="Galería" />} />
-              <Route path="configuracion" element={<AdminPlaceholder title="Configuración" />} />
+              <Route path="configuracion" element={<AdminSettings title="Configuración" />} />
             </Route>
           </Route>
         </Routes>
